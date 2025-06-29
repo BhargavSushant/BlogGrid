@@ -1,0 +1,10 @@
+{
+  "collectionName": "components_common_backlinks",
+  "info": {
+    "displayName": "Backlink"
+  },
+  "attributes": {
+    "url": { "type": "string" },
+    "label": { "type": "string" }
+  }
+}

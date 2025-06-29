@@ -4,7 +4,8 @@
   "info": {
     "singularName": "post",
     "pluralName": "posts",
-    "displayName": "Post"
+    "displayName": "Post",
+    "description": "Blog post content type"
   },
   "options": {
     "draftAndPublish": true
@@ -20,45 +21,46 @@
       "targetField": "title",
       "required": true
     },
+    "excerpt": {
+      "type": "text"
+    },
     "content": {
       "type": "richtext"
     },
-    "excerpt": {
-      "type": "string"
-    },
     "category": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "api::category.category"
     },
     "tags": {
-      "type": "string",
-      "repeatable": true
-    },
-    "featuredImage": {
-      "type": "media",
-      "multiple": false
+      "type": "component",
+      "repeatable": true,
+      "component": "common.tag"
     },
     "infographics": {
       "type": "media",
-      "multiple": true
+      "multiple": true,
+      "required": false
     },
     "backlinks": {
-      "type": "string",
-      "repeatable": true
+      "type": "component",
+      "repeatable": true,
+      "component": "common.backlink"
     },
     "externalLinks": {
-      "type": "string",
-      "repeatable": true
+      "type": "component",
+      "repeatable": true,
+      "component": "common.externallink"
     },
     "funnelType": {
       "type": "enumeration",
       "enum": [
+        "none",
         "form",
         "ebook",
-        "calendar",
-        "none"
-      ]
+        "calendar"
+      ],
+      "default": "none"
     },
     "funnelValue": {
       "type": "string"

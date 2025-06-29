@@ -393,9 +393,9 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
       'api::category.category'
     > &
       Schema.Attribute.Private;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    slug: Schema.Attribute.UID & Schema.Attribute.Required;
+    slug: Schema.Attribute.UID<'text'>;
+    text: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -406,12 +406,12 @@ export interface ApiContactMessageContactMessage
   extends Struct.CollectionTypeSchema {
   collectionName: 'contact_messages';
   info: {
-    displayName: 'Contact Message';
+    displayName: 'ContactMessage';
     pluralName: 'contact-messages';
     singularName: 'contact-message';
   };
   options: {
-    draftAndPublish: false;
+    draftAndPublish: true;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -424,9 +424,10 @@ export interface ApiContactMessageContactMessage
       'api::contact-message.contact-message'
     > &
       Schema.Attribute.Private;
-    message: Schema.Attribute.Text & Schema.Attribute.Required;
+    message: Schema.Attribute.Blocks & Schema.Attribute.Required;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    subject: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -436,6 +437,7 @@ export interface ApiContactMessageContactMessage
 export interface ApiPostPost extends Struct.CollectionTypeSchema {
   collectionName: 'posts';
   info: {
+    description: 'Blog post content type';
     displayName: 'Post';
     pluralName: 'posts';
     singularName: 'post';
@@ -444,18 +446,18 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    backlinks: Schema.Attribute.String;
-    category: Schema.Attribute.Relation<'manyToOne', 'api::category.category'>;
+    backlinks: Schema.Attribute.Component<'common.backlink', true>;
+    category: Schema.Attribute.Relation<'oneToOne', 'api::category.category'>;
     content: Schema.Attribute.RichText;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    excerpt: Schema.Attribute.String;
-    externalLinks: Schema.Attribute.String;
-    featuredImage: Schema.Attribute.Media;
+    excerpt: Schema.Attribute.Text;
+    externalLinks: Schema.Attribute.Component<'common.externallink', true>;
     funnelType: Schema.Attribute.Enumeration<
-      ['form', 'ebook', 'calendar', 'none']
-    >;
+      ['none', 'form', 'ebook', 'calendar']
+    > &
+      Schema.Attribute.DefaultTo<'none'>;
     funnelValue: Schema.Attribute.String;
     infographics: Schema.Attribute.Media<undefined, true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -463,32 +465,8 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
-    tags: Schema.Attribute.String;
+    tags: Schema.Attribute.Component<'common.tag', true>;
     title: Schema.Attribute.String & Schema.Attribute.Required;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiTestTest extends Struct.CollectionTypeSchema {
-  collectionName: 'tests';
-  info: {
-    displayName: 'test';
-    pluralName: 'tests';
-    singularName: 'test';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::test.test'> &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -511,8 +489,11 @@ export interface ApiTestimonialTestimonial extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     designation: Schema.Attribute.String;
-    feedback: Schema.Attribute.RichText;
-    image: Schema.Attribute.Media;
+    feedback: Schema.Attribute.Blocks & Schema.Attribute.Required;
+    image: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -521,6 +502,15 @@ export interface ApiTestimonialTestimonial extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    rating: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 5;
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<5>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1039,7 +1029,6 @@ declare module '@strapi/strapi' {
       'api::category.category': ApiCategoryCategory;
       'api::contact-message.contact-message': ApiContactMessageContactMessage;
       'api::post.post': ApiPostPost;
-      'api::test.test': ApiTestTest;
       'api::testimonial.testimonial': ApiTestimonialTestimonial;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

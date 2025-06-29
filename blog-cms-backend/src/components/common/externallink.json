@@ -1,0 +1,10 @@
+{
+  "collectionName": "components_common_externallinks",
+  "info": {
+    "displayName": "External Link"
+  },
+  "attributes": {
+    "url": { "type": "string" },
+    "label": { "type": "string" }
+  }
+}
